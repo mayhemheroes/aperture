@@ -45,17 +45,17 @@ func mayhemit(bytes []byte) int {
             config.UnmarshalYAML(bytes, out)
             return 0
 
-        case 6:
-            content := string(bytes)
-            var test config.KoanfUnmarshaller
-            test.Get(content)
-            return 0
+        // case 6:
+        //     content := string(bytes)
+        //     var test config.KoanfUnmarshaller
+        //     test.Get(content)
+        //     return 0
 
-        case 7:
-            content := string(bytes)
-            var test config.KoanfUnmarshaller
-            test.IsSet(content)
-            return 0
+        // case 7:
+        //     content := string(bytes)
+        //     var test config.KoanfUnmarshaller
+        //     test.IsSet(content)
+        //     return 0
 
         case 8:
             content := string(bytes)
