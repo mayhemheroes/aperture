@@ -1,8 +1,8 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.4
 
 FROM --platform=linux/amd64 gradle:7.5.1-jdk18-alpine AS builder
 
-WORKDIR /examples/armeria-example/src
+WORKDIR /examples/netty-example/src
 
 COPY --link . .
 

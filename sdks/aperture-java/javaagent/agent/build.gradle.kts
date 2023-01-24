@@ -16,7 +16,6 @@ tasks.shadowJar {
     archiveBaseName.set("agent")
     archiveClassifier.set("")
 
-
     mergeServiceFiles()
     relocate("javassist", "com.example.javassist")
 }

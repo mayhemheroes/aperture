@@ -18,7 +18,6 @@ tasks.shadowJar {
     archiveBaseName.set("fatApp")
     archiveClassifier.set("")
 
-
     mergeServiceFiles()
     relocate("javassist", "com.example.javassist")
 }
