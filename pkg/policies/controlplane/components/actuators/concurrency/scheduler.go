@@ -87,7 +87,7 @@ func NewSchedulerAndOptions(
 
 	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
-			metrics.AcceptedConcurrencyMetricName,
+			metrics.AcceptedWorkSecondsMetricName,
 			policyParams),
 		concurrencyQueryInterval,
 		componentIndex,
@@ -101,7 +101,7 @@ func NewSchedulerAndOptions(
 
 	incomingQuery, incomingQueryOptions, incomingQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
-			metrics.IncomingConcurrencyMetricName,
+			metrics.IncomingWorkSecondsMetricName,
 			policyParams),
 		concurrencyQueryInterval,
 		componentIndex,
