@@ -36,9 +36,15 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
         AttributeContext attributes = HttpUtils.attributesFromRequest(req);
+        System.out.println("Path is: " + req.path());
+        if (req.path().contains("health") || req.path().contains("connect")) {
+            System.out.println("aux endpoint, flow NOT omitted");
+//            return unwrap().serve(ctx, req);
+        }
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(attributes);
 
         if (flow.accepted()) {
+            System.out.println("Flow accepted or not connected");
             HttpResponse res;
             try {
                 List<HeaderValueOption> newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
@@ -62,6 +68,7 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             }
             return res;
         } else {
+            System.out.println("Flow rejected");
             HttpStatus code = HttpUtils.handleRejectedFlow(flow);
             return HttpResponse.of(code);
         }

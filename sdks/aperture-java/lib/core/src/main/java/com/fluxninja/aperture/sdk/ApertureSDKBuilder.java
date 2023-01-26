@@ -65,10 +65,17 @@ public final class ApertureSDKBuilder {
       timeout = DEFAULT_RPC_TIMEOUT;
     }
 
+    System.out.println("CHANNEL INPUTS:      " + host + ":" + port);
     ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
+    System.out.println("CHANNEL AUTHORITY:   " + channel.authority());
+
     FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient = FlowControlServiceGrpc
         .newBlockingStub(channel);
     AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient = AuthorizationGrpc.newBlockingStub(channel);
+
+    System.out.println("Address: " + host + ":" + port);
+    // HERE: in javaagent its /localhost:8089, in regular service its localhost:8089
+    System.out.println("Created auth grpc channel for: " + envoyAuthzClient.getChannel().authority());
 
     OtlpGrpcSpanExporter spanExporter = OtlpGrpcSpanExporter.builder()
         .setEndpoint(String.format("%s://%s:%d", protocol, host, port))

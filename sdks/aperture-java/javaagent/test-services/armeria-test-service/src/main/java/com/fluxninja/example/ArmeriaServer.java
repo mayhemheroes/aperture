@@ -14,6 +14,7 @@ public class ArmeriaServer {
         return new AbstractHttpService() {
             @Override
             protected HttpResponse doGet(ServiceRequestContext ctx, HttpRequest req) {
+                System.out.println("HELLO");
                 return HttpResponse.of("Hello, world!");
             }
         };
@@ -22,6 +23,7 @@ public class ArmeriaServer {
         return new AbstractHttpService() {
             @Override
             protected HttpResponse doGet(ServiceRequestContext ctx, HttpRequest req) {
+                System.out.println("HELTH");
                 return HttpResponse.of("Healthy");
             }
         };
@@ -30,6 +32,7 @@ public class ArmeriaServer {
         return new AbstractHttpService() {
             @Override
             protected HttpResponse doGet(ServiceRequestContext ctx, HttpRequest req) {
+                System.out.println("CONNC");
                 return HttpResponse.of("");
             }
         };

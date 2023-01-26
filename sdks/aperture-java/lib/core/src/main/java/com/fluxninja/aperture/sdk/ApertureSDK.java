@@ -110,7 +110,12 @@ public final class ApertureSDK {
       res = this.envoyAuthzClient
           .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
           .check(req);
+      System.out.println("Got some agent response");
     } catch (StatusRuntimeException e) {
+      System.out.println("Deadline exceeded or couldn't reach agent");
+      System.out.println(e.getStatus());
+      //System.out.println(e);
+      //System.out.println("Hope this helps");
       // deadline exceeded or couldn't reach agent - request should not be blocked
       res = com.fluxninja.generated.envoy.service.auth.v3.CheckResponse.newBuilder()
           .setStatus(Status.newBuilder().setCode(Code.OK_VALUE).build())

@@ -62,6 +62,7 @@ public class ArmeriaServer {
                     .setPort(Integer.parseInt(agentPort))
                     .setDuration(Duration.ofMillis(1000))
                     .build();
+            System.out.println("Created SDK pointed at " + agentHost + ":" + agentPort);
         } catch (ApertureSDKException e) {
             e.printStackTrace();
             return;
