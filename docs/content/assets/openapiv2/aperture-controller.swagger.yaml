@@ -99,18 +99,26 @@ definitions:
     type: object
     properties:
       count:
-        description: Number of buckets.
+        description: |-
+          Number of buckets.
+
+          @gotags: validate:"gt=0"
         type: integer
         format: int32
         x-go-validate: gt=0
       factor:
-        description: Factor to be multiplied to the previous bucket's upper bound
-          to calculate the following bucket's upper bound.
+        description: |-
+          Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
+
+          @gotags: validate:"gt=1.0"
         type: number
         format: double
         x-go-validate: gt=1.0
       start:
-        description: Upper bound of the lowest bucket.
+        description: |-
+          Upper bound of the lowest bucket.
+
+          @gotags: validate:"gt=0.0"
         type: number
         format: double
         x-go-validate: gt=0
@@ -121,7 +129,10 @@ definitions:
     type: object
     properties:
       count:
-        description: Number of buckets.
+        description: |-
+          Number of buckets.
+
+          @gotags: validate:"gt=0"
         type: integer
         format: int32
         x-go-validate: gt=0
@@ -130,7 +141,10 @@ definitions:
         type: number
         format: double
       min:
-        description: Lowest bucket.
+        description: |-
+          Lowest bucket.
+
+          @gotags: validate:"gt=0.0"
         type: number
         format: double
         x-go-validate: gt=0
@@ -141,7 +155,10 @@ definitions:
     type: object
     properties:
       count:
-        description: Number of buckets.
+        description: |-
+          Number of buckets.
+
+          @gotags: validate:"gt=0"
         type: integer
         format: int32
         x-go-validate: gt=0
@@ -160,10 +177,53 @@ definitions:
     properties:
       buckets:
         type: array
+        title: '@gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"'
         items:
           type: number
           format: double
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+  HorizontalPodScalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+      in_ports:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
+  HorizontalPodScalerScaleActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for ScaleActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+          Useful for observing the behavior of Scaler without disrupting any real traffic.
+
+          @gotags: default:"false"
+        type: boolean
+        x-go-default: false
+  HorizontalPodScalerScaleActuatorIns:
+    description: Inputs for the HorizontalPodScaler component.
+    type: object
+    properties:
+      desired_replicas:
+        $ref: '#/definitions/v1InPort'
+  HorizontalPodScalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
+  HorizontalPodScalerScaleReporterOuts:
+    description: Outputs for the HorizontalPodScaler component.
+    type: object
+    properties:
+      actual_replicas:
+        $ref: '#/definitions/v1OutPort'
+      configured_replicas:
+        $ref: '#/definitions/v1OutPort'
   MatchExpressionList:
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     type: object
@@ -178,11 +238,15 @@ definitions:
     type: object
     properties:
       enabled:
+        description: '@gotags: default:"false"'
         type: boolean
         title: Enables lazy sync
         x-go-default: false
       num_sync:
-        description: Number of times to lazy sync within the _limit\_reset\_interval_.
+        description: |-
+          Number of times to lazy sync within the _limit\_reset\_interval_.
+
+          @gotags: default:"5" validate:"gt=0"
         type: integer
         format: int64
         x-go-default: 5
@@ -191,12 +255,17 @@ definitions:
     type: object
     properties:
       label_value:
-        description: Value of the label for which the override should be applied.
+        description: |-
+          Value of the label for which the override should be applied.
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       limit_scale_factor:
-        description: Amount by which the _in\_ports.limit_ should be multiplied for
-          this label value.
+        description: |-
+          Amount by which the _in\_ports.limit_ should be multiplied for this label value.
+
+          @gotags: default:"1.0"
         type: number
         format: double
         x-go-default: 1
@@ -211,6 +280,8 @@ definitions:
           Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
           Note: The module name must match the package name from the "source".
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       source:
@@ -218,6 +289,8 @@ definitions:
           Source code of the rego module.
 
           Note: Must include a "package" declaration.
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
   SchedulerWorkload:
@@ -228,11 +301,16 @@ definitions:
       label_matcher:
         description: |-
           Label Matcher to select a Workload based on
-          [flow labels](/concepts/flow-control/flow-label.md).
+          [flow labels](/concepts/integrations/flow-control/flow-label.md).
+
+          @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1LabelMatcher'
       workload_parameters:
-        description: WorkloadParameters associated with flows matching the label matcher.
+        description: |-
+          WorkloadParameters associated with flows matching the label matcher.
+
+          @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/SchedulerWorkloadParameters'
   SchedulerWorkloadParameters:
@@ -243,7 +321,7 @@ definitions:
       fairness_key:
         description: |-
           Fairness key is a label key that can be used to provide fairness within a workload.
-          Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+          Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
           you have a classifier that sets `user` flow label, you might want to set
           `fairness_key = "user"`.
         type: string
@@ -252,6 +330,8 @@ definitions:
           Describes priority level of the requests within the workload.
           Priority level ranges from 0 to 255.
           Higher numbers means higher priority level.
+
+          @gotags: validate:"gte=0,lte=255"
         type: integer
         format: int64
         x-go-validate: gte=0,lte=255
@@ -259,6 +339,8 @@ definitions:
         description: |-
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
           This override is applicable only if `auto_tokens` is set to false.
+
+          @gotags: default:"1"
         type: string
         format: uint64
         x-go-default: 1
@@ -419,7 +501,10 @@ definitions:
     title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
     properties:
       from:
-        description: Attribute path pointing to some string - eg. "source.address".
+        description: |-
+          Attribute path pointing to some string - eg. "source.address".
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
   v1Alerter:
@@ -427,7 +512,9 @@ definitions:
     type: object
     properties:
       alerter_config:
+        description: '@gotags: validate:"required"'
         title: Alerter configuration
+        x-go-validate: required
         $ref: '#/definitions/v1AlerterConfig'
       in_ports:
         description: Input ports for the Alerter component.
@@ -443,15 +530,24 @@ definitions:
         items:
           type: string
       alert_name:
-        description: Name of the alert.
+        description: |-
+          Name of the alert.
+
+          @gotags: validate:"required"
         type: string
-        x-go-default: alert
+        x-go-validate: required
       resolve_timeout:
-        description: Duration of alert resolver.
+        description: |-
+          Duration of alert resolver.
+
+          @gotags: default:"300s"
         type: string
-        x-go-default: 5m
+        x-go-default: 300s
       severity:
-        description: Severity of the alert, one of 'info', 'warn' or 'crit'.
+        description: |-
+          Severity of the alert, one of 'info', 'warn' or 'crit'.
+
+          @gotags: default:"info" validate:"oneof=info warn crit"
         type: string
         x-go-default: info
         x-go-validate: oneof=info warn crit
@@ -459,9 +555,55 @@ definitions:
     description: Inputs for the Alerter component.
     type: object
     properties:
-      alert:
-        description: Signal which Alerter is monitoring.
+      signal:
+        description: Signal which Alerter is monitoring. If the signal greater than
+          0, Alerter generates an alert.
         $ref: '#/definitions/v1InPort'
+  v1And:
+    description: |-
+      Logical AND.
+
+      Signals are mapped to boolean values as follows:
+      * Zero is treated as false.
+      * Any non-zero is treated as true.
+      * Invalid inputs are considered unknown.
+
+        :::note
+        Treating invalid inputs as "unknowns" has a consequence that the result
+        might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+        because the result would end up false no matter if
+        first signal was true or false. On the other hand, `unknown && true == unknown`.
+        :::
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the And component.
+        $ref: '#/definitions/v1AndIns'
+      out_ports:
+        description: Output ports for the And component.
+        $ref: '#/definitions/v1AndOuts'
+  v1AndIns:
+    description: Inputs for the And component.
+    type: object
+    properties:
+      inputs:
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+  v1AndOuts:
+    description: Output ports for the And component.
+    type: object
+    properties:
+      output:
+        description: |-
+          Result of logical AND of all the input signals.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
+        $ref: '#/definitions/v1OutPort'
   v1ArithmeticCombinator:
     type: object
     title: Type of combinator that computes the arithmetic operation on the operand
@@ -476,6 +618,8 @@ definitions:
 
           The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
           In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
+
+          @gotags: validate:"oneof=add sub mul div xor lshift rshift"
         type: string
         x-go-validate: oneof=add sub mul div xor lshift rshift
       out_ports:
@@ -527,7 +671,10 @@ definitions:
     title: Circuit is defined as a dataflow graph of inter-connected components
     properties:
       components:
-        description: Defines a signal processing graph as a list of components.
+        description: |-
+          Defines a signal processing graph as a list of components.
+
+          @gotags: validate:"dive"
         type: array
         items:
           $ref: '#/definitions/v1Component'
@@ -535,12 +682,14 @@ definitions:
         description: |-
           Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
           This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
+
+          @gotags: default:"0.5s"
         type: string
         x-go-default: 0.5s
   v1Classifier:
     description: |-
       :::info
-      See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
+      See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
       :::
 
       Example:
@@ -560,14 +709,19 @@ definitions:
     title: Set of classification rules sharing a common selector
     properties:
       flow_selector:
-        description: Defines where to apply the flow classification rule.
+        description: |-
+          Defines where to apply the flow classification rule.
+
+          @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1FlowSelector'
       rules:
         description: |-
           A map of {key, value} pairs mapping from
-          [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+          [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
+
+          @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
         type: object
         additionalProperties:
           $ref: '#/definitions/v1Rule'
@@ -605,9 +759,10 @@ definitions:
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
       You can create an input port containing the constant value instead of being connected to a signal.
-      To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+      To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+      You can also use it to provide special math values such as NaN and +- Inf.
       If You need to provide the same constant signal to multiple components,
-      You can use the [Constant](#v1-constant) component.
+      You can use the [Variable](#v1-variable) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -618,6 +773,9 @@ definitions:
         description: Alerter reacts to a signal and generates alert to send to alert
           manager.
         $ref: '#/definitions/v1Alerter'
+      and:
+        description: Logical AND.
+        $ref: '#/definitions/v1And'
       arithmetic_combinator:
         description: Applies the given operator on input operands (signals) and emits
           the result.
@@ -626,13 +784,13 @@ definitions:
         description: Concurrency Limiter provides service protection by applying prioritized
           load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
         $ref: '#/definitions/v1ConcurrencyLimiter'
-      constant:
-        description: Emits a constant signal.
-        $ref: '#/definitions/v1Constant'
       decider:
         description: Decider emits the binary result of comparison operator on two
           operands.
         $ref: '#/definitions/v1Decider'
+      differentiator:
+        description: Differentiator calculates rate of change per tick.
+        $ref: '#/definitions/v1Differentiator'
       ema:
         description: Exponential Moving Average filter.
         $ref: '#/definitions/v1EMA'
@@ -649,22 +807,39 @@ definitions:
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
         $ref: '#/definitions/v1GradientController'
+      holder:
+        description: Holds the last valid signal value for the specified duration
+          then waits for next valid value to hold.
+        $ref: '#/definitions/v1Holder'
+      horizontal_pod_scaler:
+        description: HorizontalPodScaler provides pod horizontal scaling functionality
+          for scalable Kubernetes resources.
+        $ref: '#/definitions/v1HorizontalPodScaler'
+      integrator:
+        description: Accumulates sum of signal every tick.
+        $ref: '#/definitions/v1Integrator'
+      inverter:
+        description: Logical NOT.
+        $ref: '#/definitions/v1Inverter'
       max:
         description: Emits the maximum of the input signals.
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
         $ref: '#/definitions/v1Min'
+      or:
+        description: Logical OR.
+        $ref: '#/definitions/v1Or'
       promql:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
         $ref: '#/definitions/v1PromQL'
+      pulse_generator:
+        description: Generates 0 and 1 in turns.
+        $ref: '#/definitions/v1PulseGenerator'
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
         $ref: '#/definitions/v1RateLimiter'
-      sink:
-        description: Sink is a sink component that does nothing.
-        $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
@@ -673,10 +848,13 @@ definitions:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
         $ref: '#/definitions/v1Switcher'
+      variable:
+        description: Emits a variable signal which can be set to invalid.
+        $ref: '#/definitions/v1Variable'
   v1ConcurrencyLimiter:
     description: |-
       :::info
-      See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+      See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
       :::
 
       It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -689,8 +867,10 @@ definitions:
       to provide active service protection
     properties:
       flow_selector:
-        description: Flow Selector decides the service and flows at which the concurrency
-          limiter is applied.
+        description: |-
+          Flow Selector decides the service and flows at which the concurrency limiter is applied.
+
+          @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1FlowSelector'
       load_actuator:
@@ -705,26 +885,22 @@ definitions:
 
           Contains configuration of per-agent scheduler, and also defines some
           output signals.
+
+          @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1Scheduler'
-  v1Constant:
+  v1ConstantSignal:
+    description: Special constant input for ports and Variable component. Can provide
+      either a constant value or special Nan/+-Inf value.
     type: object
-    title: Component that emits a constant value as an output signal
     properties:
-      out_ports:
-        description: Output ports for the Constant component.
-        $ref: '#/definitions/v1ConstantOuts'
+      special_value:
+        type: string
+        title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
+        x-go-validate: oneof=NaN +Inf -Inf
       value:
-        description: The constant value to be emitted.
         type: number
         format: double
-  v1ConstantOuts:
-    description: Outputs for the Constant component.
-    type: object
-    properties:
-      output:
-        description: The constant value is emitted to the output port.
-        $ref: '#/definitions/v1OutPort'
   v1ControllerDynamicConfig:
     type: object
     title: Dynamic Configuration for a Controller
@@ -733,6 +909,8 @@ definitions:
         description: |-
           Decides whether the controller runs in "manual_mode".
           In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+
+          @gotags: default:"false"
         type: boolean
         x-go-default: false
   v1Decider:
@@ -752,14 +930,18 @@ definitions:
         description: |-
           Duration of time to wait before a transition to false state.
           If the duration is zero, the transition will happen instantaneously.
+
+          @gotags: default:"0s"
         type: string
         x-go-default: 0s
       in_ports:
         description: Input ports for the Decider component.
         $ref: '#/definitions/v1DeciderIns'
       operator:
-        description: Comparison operator that computes operation on lhs and rhs input
-          signals.
+        description: |-
+          Comparison operator that computes operation on lhs and rhs input signals.
+
+          @gotags: validate:"oneof=gt lt gte lte eq neq"
         type: string
         x-go-validate: oneof=gt lt gte lte eq neq
       out_ports:
@@ -769,6 +951,8 @@ definitions:
         description: |-
           Duration of time to wait before a transition to true state.
           If the duration is zero, the transition will happen instantaneously.
+
+          @gotags: default:"0s"
         type: string
         x-go-default: 0s
   v1DeciderIns:
@@ -787,6 +971,35 @@ definitions:
     properties:
       output:
         description: Selected signal (1.0 or 0.0).
+        $ref: '#/definitions/v1OutPort'
+  v1Differentiator:
+    description: Differentiator calculates rate of change per tick.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Differentiator component.
+        $ref: '#/definitions/v1DifferentiatorIns'
+      out_ports:
+        description: Output ports for the Differentiator component.
+        $ref: '#/definitions/v1DifferentiatorOuts'
+      window:
+        description: |-
+          The window of time over which differentiator operates.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-default: 5s
+  v1DifferentiatorIns:
+    description: Inputs for the Differentiator component.
+    type: object
+    properties:
+      input:
+        $ref: '#/definitions/v1InPort'
+  v1DifferentiatorOuts:
+    description: Outputs for the Differentiator component.
+    type: object
+    properties:
+      output:
         $ref: '#/definitions/v1OutPort'
   v1EMA:
     description: |-
@@ -819,21 +1032,28 @@ definitions:
       exponentially more weight to recent signal readings
     properties:
       correction_factor_on_max_envelope_violation:
-        description: Correction factor to apply on the output value if its in violation
-          of the max envelope.
+        description: |-
+          Correction factor to apply on the output value if its in violation of the max envelope.
+
+          @gotags: validate:"gte=0,lte=1.0" default:"1.0"
         type: number
         format: double
         x-go-default: 1
         x-go-validate: gte=0,lte=1.0
       correction_factor_on_min_envelope_violation:
-        description: Correction factor to apply on the output value if its in violation
-          of the min envelope.
+        description: |-
+          Correction factor to apply on the output value if its in violation of the min envelope.
+
+          @gotags: validate:"gte=1.0" default:"1.0"
         type: number
         format: double
         x-go-default: 1
         x-go-validate: gte=1.0
       ema_window:
-        description: Duration of EMA sampling window.
+        description: |-
+          Duration of EMA sampling window.
+
+          @gotags: default:"5s"
         type: string
         x-go-default: 5s
       in_ports:
@@ -843,7 +1063,10 @@ definitions:
         description: Output ports for the EMA component.
         $ref: '#/definitions/v1EMAOuts'
       valid_during_warmup:
-        description: Whether the output is valid during the warm up stage.
+        description: |-
+          Whether the output is valid during the warm up stage.
+
+          @gotags: default:"false"
         type: boolean
         x-go-default: false
       warm_up_window:
@@ -851,6 +1074,8 @@ definitions:
           Duration of EMA warming up window.
 
           The initial value of the EMA is the average of signal readings received during the warm up window.
+
+          @gotags: default:"0s"
         type: string
         x-go-default: 0s
   v1EMAIns:
@@ -895,7 +1120,10 @@ definitions:
     type: object
     properties:
       label:
-        description: Name of the label to equal match the value.
+        description: |-
+          Name of the label to equal match the value.
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       value:
@@ -949,8 +1177,10 @@ definitions:
         description: Input ports for the Extrapolator component.
         $ref: '#/definitions/v1ExtrapolatorIns'
       max_extrapolation_interval:
-        description: Maximum time interval to repeat the last valid value of input
-          signal.
+        description: |-
+          Maximum time interval to repeat the last valid value of input signal.
+
+          @gotags: default:"10s"
         type: string
         x-go-default: 10s
       out_ports:
@@ -986,7 +1216,10 @@ definitions:
     type: object
     properties:
       inputs:
-        description: Array of input signals.
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
         type: array
         items:
           $ref: '#/definitions/v1InPort'
@@ -1000,7 +1233,7 @@ definitions:
   v1FlowMatcher:
     description: |-
       :::info
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
       :::
 
       Example:
@@ -1021,21 +1254,23 @@ definitions:
     type: object
     title: |-
       Describes which flows a [flow control
-      component](/concepts/flow-control/flow-control.md#components) should apply
+      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
       to
     properties:
       control_point:
         description: |-
-          [Control Point](/concepts/flow-control/flow-control.md#control-point)
+          [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
           identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
           block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
           or filter chains.
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       label_matcher:
         description: |-
           :::info
-          See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+          See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
           :::
 
           :::note
@@ -1050,25 +1285,25 @@ definitions:
           :::
         title: |-
           Label matcher allows to add _additional_ condition on
-          [flow labels](/concepts/flow-control/flow-label.md)
+          [flow labels](/concepts/integrations/flow-control/flow-label.md)
           must also be satisfied (in addition to service+control point matching)
         $ref: '#/definitions/v1LabelMatcher'
   v1FlowSelector:
     description: |-
       :::info
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
       :::
     type: object
     title: |-
       Describes which flow in which service a [flow control
-      component](/concepts/flow-control/flow-control.md#components) should apply
+      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
       to
     properties:
       flow_matcher:
+        title: '@gotags: validate:"required"'
         x-go-validate: required
         $ref: '#/definitions/v1FlowMatcher'
       service_selector:
-        x-go-validate: required
         $ref: '#/definitions/v1ServiceSelector'
   v1FluxMeter:
     description: |-
@@ -1076,7 +1311,7 @@ definitions:
       The histogram created by Flux Meter measures the workload latency by default.
 
       :::info
-      See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
+      See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
       :::
 
       Example of a selector that creates a histogram metric for all HTTP requests
@@ -1096,8 +1331,10 @@ definitions:
 
           :::info
           For list of available attributes in Envoy access logs, refer
-          [Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
+          [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
           :::
+
+          @gotags: default:"workload_duration_ms"
         type: string
         x-go-default: workload_duration_ms
       exponential_buckets:
@@ -1153,14 +1390,18 @@ definitions:
         description: Input ports of the Gradient Controller.
         $ref: '#/definitions/v1GradientControllerIns'
       max_gradient:
-        description: Maximum gradient which clamps the computed gradient value to
-          the range, [min_gradient, max_gradient].
+        description: |-
+          Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+
+          @gotags: default:"1.79769313486231570814527423731704356798070e+308"
         type: number
         format: double
         x-go-default: 1.7976931348623157e+308
       min_gradient:
-        description: Minimum gradient which clamps the computed gradient value to
-          the range, [min_gradient, max_gradient].
+        description: |-
+          Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+
+          @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
         type: number
         format: double
         x-go-default: -1.7976931348623157e+308
@@ -1207,6 +1448,8 @@ definitions:
           Remember that the gradient and output signal can be (optionally) clamped,
           so the _slope_ might not fully describe aggressiveness of the controller.
           :::
+
+          @gotags: validate:"required"
         type: number
         format: double
         x-go-validate: required
@@ -1254,6 +1497,49 @@ definitions:
           $ref: '#/definitions/v1GroupStatus'
       status:
         $ref: '#/definitions/statusv1Status'
+  v1Holder:
+    description: |-
+      Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+      If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+    type: object
+    properties:
+      hold_for:
+        description: |-
+          Holding the last valid signal value for the hold_for duration.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-default: 5s
+      in_ports:
+        $ref: '#/definitions/v1HolderIns'
+      out_ports:
+        $ref: '#/definitions/v1HolderOuts'
+  v1HolderIns:
+    description: Inputs for the Holder component.
+    type: object
+    properties:
+      input:
+        $ref: '#/definitions/v1InPort'
+  v1HolderOuts:
+    description: Outputs for the Holder component.
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+  v1HorizontalPodScaler:
+    type: object
+    properties:
+      kubernetes_object_selector:
+        description: |-
+          The Kubernetes object on which horizontal scaling is applied.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        $ref: '#/definitions/v1KubernetesObjectSelector'
+      scale_actuator:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuator'
+      scale_reporter:
+        $ref: '#/definitions/HorizontalPodScalerScaleReporter'
   v1HostInfo:
     type: object
     properties:
@@ -1267,13 +1553,78 @@ definitions:
     type: object
     title: Components receive input from other components via InPorts
     properties:
-      constant_value:
+      constant_signal:
         description: Constant value to be used for this InPort instead of a signal.
-        type: number
-        format: double
+        $ref: '#/definitions/v1ConstantSignal'
       signal_name:
         description: Name of the incoming Signal on the InPort.
         type: string
+  v1Integrator:
+    description: Accumulates sum of signal every tick.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Integrator component.
+        $ref: '#/definitions/v1IntegratorIns'
+      out_ports:
+        description: Output ports for the Integrator component.
+        $ref: '#/definitions/v1IntegratorOuts'
+  v1IntegratorIns:
+    description: Inputs for the Integrator component.
+    type: object
+    properties:
+      input:
+        description: The input signal.
+        $ref: '#/definitions/v1InPort'
+      max:
+        description: The maximum output when reset is not set.
+        $ref: '#/definitions/v1InPort'
+      min:
+        description: The minimum output when reset is not set.
+        $ref: '#/definitions/v1InPort'
+      reset:
+        description: Resets the integrator output to zero when reset signal is valid
+          and non-zero.
+        $ref: '#/definitions/v1InPort'
+  v1IntegratorOuts:
+    description: Outputs for the Integrator component.
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+  v1Inverter:
+    description: |-
+      Logical NOT.
+
+      See [And component](#v1-and) on how signals are mapped onto boolean values.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Inverter component.
+        $ref: '#/definitions/v1InverterIns'
+      out_ports:
+        description: Output ports for the Inverter component.
+        $ref: '#/definitions/v1InverterOuts'
+  v1InverterIns:
+    description: Inputs for the Inverter component.
+    type: object
+    properties:
+      input:
+        description: |-
+          Signal to be negated.
+
+          @gotags: validate:"dive"
+        $ref: '#/definitions/v1InPort'
+  v1InverterOuts:
+    description: Output ports for the Inverter component.
+    type: object
+    properties:
+      output:
+        description: |-
+          Logical negation of the input signal.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
+        $ref: '#/definitions/v1OutPort'
   v1JSONExtractor:
     description: |-
       Example:
@@ -1285,7 +1636,10 @@ definitions:
     title: Deserialize a json, and extract one of the fields
     properties:
       from:
-        description: Attribute path pointing to some strings - eg. "request.http.body".
+        description: |-
+          Attribute path pointing to some strings - eg. "request.http.body".
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       pointer:
@@ -1311,8 +1665,10 @@ definitions:
     title: Parse the attribute as JWT and read the payload
     properties:
       from:
-        description: Jwt token can be pulled from any input attribute, but most likely
-          you'd want to use "request.http.bearer".
+        description: |-
+          Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       json_pointer:
@@ -1328,13 +1684,18 @@ definitions:
     type: object
     properties:
       key:
-        description: Label key that the selector applies to.
+        description: |-
+          Label key that the selector applies to.
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       operator:
         description: |-
           Logical operator which represents a key's relationship to a set of values.
           Valid operators are In, NotIn, Exists and DoesNotExist.
+
+          @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
         type: string
         x-go-validate: oneof=In NotIn Exists DoesNotExists
       values:
@@ -1345,6 +1706,46 @@ definitions:
         type: array
         items:
           type: string
+  v1KubernetesObjectSelector:
+    description: |-
+      Describes which pods a control or observability
+      component should apply to.
+    type: object
+    properties:
+      agent_group:
+        description: |-
+          Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+          selector applies to.
+
+          @gotags: default:"default"
+        type: string
+        x-go-default: default
+      api_version:
+        description: '@gotags: validate:"required"'
+        type: string
+        title: API version of Kubernetes resource
+        x-go-validate: required
+      kind:
+        description: |-
+          Kubernetes resource type.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      name:
+        description: |-
+          Kubernetes resource name.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      namespace:
+        description: |-
+          Kubernetes namespace that the resource belongs to.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
   v1LabelMatcher:
     description: |-
       It provides three ways to define requirements:
@@ -1357,7 +1758,7 @@ definitions:
     type: object
     title: |-
       Allows to define rules whether a map of
-      [labels](/concepts/flow-control/flow-label.md)
+      [labels](/concepts/integrations/flow-control/flow-label.md)
       should be considered a match or not
     properties:
       expression:
@@ -1386,7 +1787,8 @@ definitions:
       in the data-plane
     properties:
       alerter_config:
-        description: Configuration for embedded alerter.
+        description: Configuration for embedded alerter. No alerts are generated if
+          this configuration is not provided.
         $ref: '#/definitions/v1AlerterConfig'
       default_config:
         description: Default configuration.
@@ -1439,7 +1841,10 @@ definitions:
         description: The expression is true when label value equals given value.
         $ref: '#/definitions/v1EqualsMatchExpression'
       label_exists:
-        description: The expression is true when label with given name exists.
+        description: |-
+          The expression is true when label with given name exists.
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       label_matches:
@@ -1453,13 +1858,18 @@ definitions:
     type: object
     properties:
       label:
-        description: Name of the label to match the regular expression.
+        description: |-
+          Name of the label to match the regular expression.
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       regex:
         description: |-
           Regular expression that should match the label value.
           It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
   v1Max:
@@ -1478,7 +1888,10 @@ definitions:
     type: object
     properties:
       inputs:
-        description: Array of input signals.
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
         type: array
         items:
           $ref: '#/definitions/v1InPort'
@@ -1506,7 +1919,10 @@ definitions:
     type: object
     properties:
       inputs:
-        description: Array of input signals.
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
         type: array
         items:
           $ref: '#/definitions/v1InPort'
@@ -1516,6 +1932,41 @@ definitions:
     properties:
       output:
         description: Signal with minimum value as an output signal.
+        $ref: '#/definitions/v1OutPort'
+  v1Or:
+    description: |-
+      Logical OR.
+
+      See [And component](#v1-and) on how signals are mapped onto boolean values.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Or component.
+        $ref: '#/definitions/v1OrIns'
+      out_ports:
+        description: Output ports for the Or component.
+        $ref: '#/definitions/v1OrOuts'
+  v1OrIns:
+    description: Inputs for the Or component.
+    type: object
+    properties:
+      inputs:
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+  v1OrOuts:
+    description: Output ports for the Or component.
+    type: object
+    properties:
+      output:
+        description: |-
+          Result of logical OR of all the input signals.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
         $ref: '#/definitions/v1OutPort'
   v1OutPort:
     type: object
@@ -1555,6 +2006,8 @@ definitions:
           "/user/{userId}": user
           /static/*: other
           ```
+
+          @gotags: validate:"gt=0,dive,keys,required,endkeys,required"
         type: object
         additionalProperties:
           type: string
@@ -1597,8 +2050,10 @@ definitions:
       as an output signal
     properties:
       evaluation_interval:
-        description: Describes the interval between successive evaluations of the
-          Prometheus query.
+        description: |-
+          Describes the interval between successive evaluations of the Prometheus query.
+
+          @gotags: default:"10s"
         type: string
         x-go-default: 10s
       out_ports:
@@ -1620,10 +2075,36 @@ definitions:
       output:
         description: The result of the Prometheus query as an output signal.
         $ref: '#/definitions/v1OutPort'
+  v1PulseGenerator:
+    description: Generates 0 and 1 in turns.
+    type: object
+    properties:
+      false_for:
+        description: |-
+          Emitting 0 for the false_for duration.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-default: 5s
+      out_ports:
+        $ref: '#/definitions/v1PulseGeneratorOuts'
+      true_for:
+        description: |-
+          Emitting 1 for the true_for duration.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-default: 5s
+  v1PulseGeneratorOuts:
+    description: Outputs for the PulseGenerator component.
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
   v1RateLimiter:
     description: |-
       :::info
-      See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+      See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
       :::
 
       Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -1638,10 +2119,14 @@ definitions:
         type: string
         title: Configuration key for DynamicConfig
       flow_selector:
-        description: Which control point to apply this ratelimiter to.
+        description: |-
+          Which control point to apply this ratelimiter to.
+
+          @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1FlowSelector'
       in_ports:
+        title: '@gotags: validate:"required"'
         x-go-validate: required
         $ref: '#/definitions/v1RateLimiterIns'
       label_key:
@@ -1649,16 +2134,21 @@ definitions:
           Specifies which label the ratelimiter should be keyed by.
 
           Rate limiting is done independently for each value of the
-          [label](/concepts/flow-control/flow-label.md) with given key.
+          [label](/concepts/integrations/flow-control/flow-label.md) with given key.
           Eg., to give each user a separate limit, assuming you have a _user_ flow
           label set up, set `label_key: "user"`.
+
+          @gotags: validate:"required"
         type: string
         x-go-validate: required
       lazy_sync:
         title: Configuration of lazy-syncing behaviour of ratelimiter
         $ref: '#/definitions/RateLimiterLazySync'
       limit_reset_interval:
-        description: Time after which the limit for a given label value will be reset.
+        description: |-
+          Time after which the limit for a given label value will be reset.
+
+          @gotags: default:"60s"
         type: string
         x-go-default: 60s
   v1RateLimiterDynamicConfig:
@@ -1666,7 +2156,10 @@ definitions:
     title: Dynamic Configuration for the rate limiter
     properties:
       overrides:
-        description: Allows to specify different limits for particular label values.
+        description: |-
+          Allows to specify different limits for particular label values.
+
+          @gotags: validate:"dive"
         type: array
         items:
           $ref: '#/definitions/RateLimiterOverride'
@@ -1683,6 +2176,8 @@ definitions:
           Negative limit can be useful to _conditionally_ enable the ratelimiter
           under certain circumstances. [Decider](#v1-decider) might be helpful.
           :::
+
+          @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1InPort'
   v1Resources:
@@ -1700,6 +2195,8 @@ definitions:
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
           The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
+          @gotags: validate:"dive"
         type: array
         items:
           $ref: '#/definitions/v1Classifier'
@@ -1708,6 +2205,8 @@ definitions:
           Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
           Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
+          @gotags: validate:"dive"
         type: object
         additionalProperties:
           $ref: '#/definitions/v1FluxMeter'
@@ -1764,14 +2263,16 @@ definitions:
           :::
 
           :::caution
-          When using [FluxNinja Cloud plugin](cloud/plugin.md), telemetry enabled
-          labels are sent to FluxNinha Cloud for observability. Telemetry should be disabled for
+          When using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled
+          labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
           sensitive labels.
           :::
+
+          @gotags: default:"true"
         type: boolean
         title: |-
           Decides if the created flow label should be available as an attribute in OLAP telemetry and
-          propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+          propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
         x-go-validate: required
   v1Scheduler:
     description: |-
@@ -1790,11 +2291,15 @@ definitions:
           historical latency. Each workload's `tokens` will be set to average
           latency of flows in that workload during last few seconds (exact duration
           of this average can change).
+
+          @gotags: default:"true"
         type: boolean
         x-go-default: "true"
       default_workload_parameters:
-        description: WorkloadParameters to be used if none of workloads specified
-          in `workloads` match.
+        description: |-
+          WorkloadParameters to be used if none of workloads specified in `workloads` match.
+
+          @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/SchedulerWorkloadParameters'
       max_timeout:
@@ -1814,6 +2319,8 @@ definitions:
           value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
           tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
           :::
+
+          @gotags: default:"0.49s"
         type: string
         title: Max Timeout is the value with which the flow timeout calculated by
           `timeout_factor` is capped
@@ -1827,6 +2334,8 @@ definitions:
           it will be rejected.
 
           This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
+
+          @gotags: validate:"gte=0.0" default:"0.5"
         type: number
         format: double
         title: Timeout as a factor of tokens for a flow in a workload
@@ -1836,7 +2345,7 @@ definitions:
         description: |-
           List of workloads to be used in scheduler.
 
-          Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+          Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
           allows for load-shedding to be "smarter" than just "randomly deny 50% of
           requests". There are two aspects of this "smartness":
           * Scheduler can more precisely calculate concurrency if it understands
@@ -1852,8 +2361,10 @@ definitions:
 
           :::info
           See also [workload definition in the concepts
-          section](/concepts/flow-control/concurrency-limiter.md#workload).
+          section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
           :::
+
+          @gotags: validate:"dive"
         type: array
         items:
           $ref: '#/definitions/SchedulerWorkload'
@@ -1867,7 +2378,7 @@ definitions:
 
           :::info
           **Accepted tokens** are tokens associated with
-          [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+          [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
           this scheduler. Number of tokens for a flow is determined by a
           [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
           via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -1884,24 +2395,26 @@ definitions:
   v1ServiceSelector:
     description: |-
       :::info
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
       :::
     type: object
     title: |-
       Describes which service a [flow control or observability
-      component](/concepts/flow-control/flow-control.md#components) should apply
+      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
       to
     properties:
       agent_group:
         description: |-
-          Which [agent-group](/concepts/service.md#agent-group) this
+          Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
           selector applies to.
+
+          @gotags: default:"default"
         type: string
         x-go-default: default
       service:
         description: |-
           The Fully Qualified Domain Name of the
-          [service](/concepts/service.md) to select.
+          [service](/concepts/integrations/flow-control/service.md) to select.
 
           In kubernetes, this is the FQDN of the Service object.
 
@@ -1911,22 +2424,6 @@ definitions:
           One entity may belong to multiple services.
           :::
         type: string
-  v1Sink:
-    type: object
-    title: Sink is a component that consumes input signals and does nothing with them
-    properties:
-      in_ports:
-        description: Input ports for the Sink component.
-        $ref: '#/definitions/v1SinkIns'
-  v1SinkIns:
-    description: Inputs for the Sink component.
-    type: object
-    properties:
-      inputs:
-        description: Array of input signals.
-        type: array
-        items:
-          $ref: '#/definitions/v1InPort'
   v1Sqrt:
     description: |-
       $$
@@ -1943,8 +2440,10 @@ definitions:
         description: Output ports for the Sqrt component.
         $ref: '#/definitions/v1SqrtOuts'
       scale:
-        description: Scaling factor to be multiplied with the square root of the input
-          signal.
+        description: |-
+          Scaling factor to be multiplied with the square root of the input signal.
+
+          @gotags default:"1.0"
         type: number
         format: double
         x-go-default: 1
@@ -2001,6 +2500,32 @@ definitions:
     properties:
       output:
         description: Selected signal (on_true or on_false).
+        $ref: '#/definitions/v1OutPort'
+  v1Variable:
+    description: Component that emits a variable value as an output signal, can be
+      defined in dynamic configuration.
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/v1VariableDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
+      out_ports:
+        description: Output ports for the Variable component.
+        $ref: '#/definitions/v1VariableOuts'
+  v1VariableDynamicConfig:
+    type: object
+    properties:
+      constant_signal:
+        $ref: '#/definitions/v1ConstantSignal'
+  v1VariableOuts:
+    description: Outputs for the Variable component.
+    type: object
+    properties:
+      output:
+        description: The value is emitted to the output port.
         $ref: '#/definitions/v1OutPort'
   v1VersionInfo:
     type: object

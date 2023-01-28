@@ -57,12 +57,14 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 
 // Execute implements runtime.Component.Execute.
 func (a *Alerter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	signalValue := inPortReadings.ReadSingleValuePort("alert")
+	signalValue := inPortReadings.ReadSingleValuePort("signal")
 	if !signalValue.Valid() {
 		return nil, nil
 	}
 
-	a.alerterIface.AddAlert(a.createAlert())
+	if signalValue.Value() > 0 {
+		a.alerterIface.AddAlert(a.createAlert())
+	}
 
 	return nil, nil
 }
@@ -78,7 +80,7 @@ func (a *Alerter) createAlert() *alerts.Alert {
 		alerts.WithAlertChannels(a.alertChannels),
 		alerts.WithLabel("policy_name", a.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "alerter"),
-		alerts.WithAnnotation("resolve_timeout", a.resolveTimeout.String()),
+		alerts.WithResolveTimeout(a.resolveTimeout),
 		alerts.WithGeneratorURL(
 			fmt.Sprintf("http://%s/%s/%s", info.GetHostInfo().Hostname, a.policyReadAPI.GetPolicyName(), a.name),
 		),

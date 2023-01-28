@@ -7,6 +7,12 @@
   withAlerterMixin(alerter):: {
     alerter+: alerter,
   },
+  withAnd(and):: {
+    and: and,
+  },
+  withAndMixin(and):: {
+    and+: and,
+  },
   withArithmeticCombinator(arithmetic_combinator):: {
     arithmetic_combinator: arithmetic_combinator,
   },
@@ -19,17 +25,17 @@
   withConcurrencyLimiterMixin(concurrency_limiter):: {
     concurrency_limiter+: concurrency_limiter,
   },
-  withConstant(constant):: {
-    constant: constant,
-  },
-  withConstantMixin(constant):: {
-    constant+: constant,
-  },
   withDecider(decider):: {
     decider: decider,
   },
   withDeciderMixin(decider):: {
     decider+: decider,
+  },
+  withDifferentiator(differentiator):: {
+    differentiator: differentiator,
+  },
+  withDifferentiatorMixin(differentiator):: {
+    differentiator+: differentiator,
   },
   withEma(ema):: {
     ema: ema,
@@ -55,6 +61,30 @@
   withGradientControllerMixin(gradient_controller):: {
     gradient_controller+: gradient_controller,
   },
+  withHolder(holder):: {
+    holder: holder,
+  },
+  withHolderMixin(holder):: {
+    holder+: holder,
+  },
+  withHorizontalPodScaler(horizontal_pod_scaler):: {
+    horizontal_pod_scaler: horizontal_pod_scaler,
+  },
+  withHorizontalPodScalerMixin(horizontal_pod_scaler):: {
+    horizontal_pod_scaler+: horizontal_pod_scaler,
+  },
+  withIntegrator(integrator):: {
+    integrator: integrator,
+  },
+  withIntegratorMixin(integrator):: {
+    integrator+: integrator,
+  },
+  withInverter(inverter):: {
+    inverter: inverter,
+  },
+  withInverterMixin(inverter):: {
+    inverter+: inverter,
+  },
   withMax(max):: {
     max: max,
   },
@@ -67,23 +97,29 @@
   withMinMixin(min):: {
     min+: min,
   },
+  withOr(or):: {
+    or: or,
+  },
+  withOrMixin(or):: {
+    or+: or,
+  },
   withPromql(promql):: {
     promql: promql,
   },
   withPromqlMixin(promql):: {
     promql+: promql,
   },
+  withPulseGenerator(pulse_generator):: {
+    pulse_generator: pulse_generator,
+  },
+  withPulseGeneratorMixin(pulse_generator):: {
+    pulse_generator+: pulse_generator,
+  },
   withRateLimiter(rate_limiter):: {
     rate_limiter: rate_limiter,
   },
   withRateLimiterMixin(rate_limiter):: {
     rate_limiter+: rate_limiter,
-  },
-  withSink(sink):: {
-    sink: sink,
-  },
-  withSinkMixin(sink):: {
-    sink+: sink,
   },
   withSqrt(sqrt):: {
     sqrt: sqrt,
@@ -96,5 +132,11 @@
   },
   withSwitcherMixin(switcher):: {
     switcher+: switcher,
+  },
+  withVariable(variable):: {
+    variable: variable,
+  },
+  withVariableMixin(variable):: {
+    variable+: variable,
   },
 }

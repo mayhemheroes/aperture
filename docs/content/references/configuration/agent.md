@@ -24,11 +24,12 @@ Generated File Starts
 | `client`            | [Client](#client)                      |
 | `dist_cache`        | [DistCache](#dist-cache)               |
 | `etcd`              | [Etcd](#etcd)                          |
+| `flow_control`      | [FlowControl](#flow-control)           |
 | `kubernetes_client` | [KubernetesClient](#kubernetes-client) |
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
 | `metrics`           | [Metrics](#metrics)                    |
-| `otel`              | [Otel](#otel)                          |
+| `otel`              | [OTEL](#o-t-e-l)                       |
 | `peer_discovery`    | [PeerDiscovery](#peer-discovery)       |
 | `plugins`           | [Plugins](#plugins)                    |
 | `profilers`         | [Profilers](#profilers)                |
@@ -119,6 +120,26 @@ Env-Var Prefix: `APERTURE_AGENT_ETCD_`
 
 Env-Var Prefix: `APERTURE_AGENT_ETCD_`
 Type: [EtcdConfig](#etcd-config)
+
+</dd>
+
+</dl>
+
+### _FlowControl_ {#flow-control}
+
+Key: `flow_control`
+
+Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_`
+
+#### Members
+
+<dl>
+
+<dt>preview_service</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
+Type: [FlowPreviewConfig](#flow-preview-config)
 
 </dd>
 
@@ -232,7 +253,7 @@ Type: [MetricsConfig](#metrics-config)
 
 </dl>
 
-### _Otel_ {#otel}
+### _OTEL_ {#o-t-e-l}
 
 Key: `otel`
 
@@ -246,7 +267,7 @@ Env-Var Prefix: `APERTURE_AGENT_OTEL_`
 <dd>
 
 Env-Var Prefix: `APERTURE_AGENT_OTEL_PROXY_`
-Type: [OtelConfig](#otel-config)
+Type: [UserOTELConfig](#user-o-t-e-l-config)
 
 </dd>
 
@@ -520,7 +541,7 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 
 (string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 
-[Read more about agent groups here](/concepts/service.md#agent-group).
+[Read more about agent groups here](/concepts/integrations/flow-control/service.md#agent-group).
 
 </dd>
 </dl>
@@ -801,9 +822,24 @@ EtcdConfig holds configuration for etcd client.
 </dd>
 </dl>
 
+### FlowPreviewConfig {#flow-preview-config}
+
+FlowPreviewConfig is the configuration for the flow control preview service.
+
+#### Properties
+
+<dl>
+<dt>enabled</dt>
+<dd>
+
+(bool, default: `true`) Enables the flow preview service.
+
+</dd>
+</dl>
+
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
-FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
+FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 
 #### Properties
 
@@ -1186,6 +1222,12 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 #### Properties
 
 <dl>
+<dt>autoscale_enabled</dt>
+<dd>
+
+(bool, default: `true`)
+
+</dd>
 <dt>discovery_enabled</dt>
 <dd>
 
@@ -1328,39 +1370,6 @@ MetricsConfig holds configuration for service metrics.
 <dd>
 
 (bool, default: `false`) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
-
-</dd>
-</dl>
-
-### OtelConfig {#otel-config}
-
-OtelConfig is the configuration for the OTEL collector.
-
-#### Properties
-
-<dl>
-<dt>batch_alerts</dt>
-<dd>
-
-([BatchAlertsConfig](#batch-alerts-config))
-
-</dd>
-<dt>batch_postrollup</dt>
-<dd>
-
-([BatchPostrollupConfig](#batch-postrollup-config))
-
-</dd>
-<dt>batch_prerollup</dt>
-<dd>
-
-([BatchPrerollupConfig](#batch-prerollup-config))
-
-</dd>
-<dt>ports</dt>
-<dd>
-
-([PortsConfig](#ports-config))
 
 </dd>
 </dl>
@@ -1641,6 +1650,39 @@ StaticDiscoveryConfig for pre-determined list of services.
 <dd>
 
 ([[]ServiceConfig](#service-config)) Services list.
+
+</dd>
+</dl>
+
+### UserOTELConfig {#user-o-t-e-l-config}
+
+UserOTELConfig is the configuration for the OTEL collector.
+
+#### Properties
+
+<dl>
+<dt>batch_alerts</dt>
+<dd>
+
+([BatchAlertsConfig](#batch-alerts-config))
+
+</dd>
+<dt>batch_postrollup</dt>
+<dd>
+
+([BatchPostrollupConfig](#batch-postrollup-config))
+
+</dd>
+<dt>batch_prerollup</dt>
+<dd>
+
+([BatchPrerollupConfig](#batch-prerollup-config))
+
+</dd>
+<dt>ports</dt>
+<dd>
+
+([PortsConfig](#ports-config))
 
 </dd>
 </dl>

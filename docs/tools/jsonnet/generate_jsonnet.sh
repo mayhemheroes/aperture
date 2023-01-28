@@ -15,6 +15,14 @@ if [ "$(uname)" == "Darwin" ]; then
 	AWK="gawk"
 fi
 
+# accept a --force flag to force the regeneration of all graphs
+# check if $1 is bounded and equal to --force
+if [[ -n "${1:-}" ]] && [[ "$1" == "--force" ]]; then
+	force=true
+else
+	force=false
+fi
+
 # run jb install in the blueprints_root
 pushd "${blueprints_root}" >/dev/null
 jb install
@@ -97,12 +105,15 @@ for jsonnet_file in $jsonnet_files; do
 		git add "$yamlfilepath"
 		# generate mermaid diagram
 		# compile the policy and generate mermaid if yaml has changed
-		if [ "$old_yaml_file_contents" != "$(cat "$yamlfilepath")" ]; then
+		if [ "$old_yaml_file_contents" != "$(cat "$yamlfilepath")" ] || [ "$force" = true ]; then
 			# generate mermaid diagram
 			mermaidfilepath="${jsonnet_file%.*}".mmd
 			# compile the policy
 			go run "$gitroot"/cmd/circuit-compiler/main.go -cr "$yamlfilepath" --mermaid "$mermaidfilepath"
 			git add "$mermaidfilepath"
+		else
+			# still validate the policy with compiler
+			go run "$gitroot"/cmd/circuit-compiler/main.go -cr "$yamlfilepath"
 		fi
 	else
 		npx prettier --write "$jsonfilepath"

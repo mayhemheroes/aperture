@@ -46,8 +46,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
 	case *policylangv1.Component_Promql:
 		ctor = mkCtor(config.Promql, promql.NewPromQLAndOptions)
-	case *policylangv1.Component_Constant:
-		ctor = mkCtor(config.Constant, components.NewConstantAndOptions)
+	case *policylangv1.Component_Variable:
+		ctor = mkCtor(config.Variable, components.NewVariableAndOptions)
 	case *policylangv1.Component_Decider:
 		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:
@@ -62,10 +62,22 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.Extrapolator, components.NewExtrapolatorAndOptions)
 	case *policylangv1.Component_FirstValid:
 		ctor = mkCtor(config.FirstValid, components.NewFirstValidAndOptions)
-	case *policylangv1.Component_Sink:
-		ctor = mkCtor(config.Sink, components.NewSinkAndOptions)
 	case *policylangv1.Component_Alerter:
 		ctor = mkCtor(config.Alerter, components.NewAlerterAndOptions)
+	case *policylangv1.Component_Integrator:
+		ctor = mkCtor(config.Integrator, components.NewIntegratorAndOptions)
+	case *policylangv1.Component_Differentiator:
+		ctor = mkCtor(config.Differentiator, components.NewDifferentiatorAndOptions)
+	case *policylangv1.Component_And:
+		ctor = mkCtor(config.And, components.NewAndAndOptions)
+	case *policylangv1.Component_Or:
+		ctor = mkCtor(config.Or, components.NewOrAndOptions)
+	case *policylangv1.Component_Inverter:
+		ctor = mkCtor(config.Inverter, components.NewInverterAndOptions)
+	case *policylangv1.Component_PulseGenerator:
+		ctor = mkCtor(config.PulseGenerator, components.NewPulseGeneratorAndOptions)
+	case *policylangv1.Component_Holder:
+		ctor = mkCtor(config.Holder, components.NewHolderAndOptions)
 	default:
 		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
 	}

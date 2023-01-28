@@ -1,10 +1,26 @@
 plugins {
     id("java")
     id("application")
+    id("com.github.johnrengelman.shadow")
 }
 
 application {
     mainClass.set("com.fluxninja.example.App")
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "com.fluxninja.example.App"
+    }
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("fatApp")
+    archiveClassifier.set("")
+
+
+    mergeServiceFiles()
+    relocate("javassist", "com.example.javassist")
 }
 
 dependencies {
