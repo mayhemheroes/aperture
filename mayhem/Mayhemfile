@@ -9,4 +9,5 @@ cmds:
 
     # Command used to start the target, "@@" is the input file
     # (when "@@" is omitted Mayhem defaults to stdin inputs)
-    - cmd: ./fuzzAperture.libfuzzer
+    - cmd: /fuzzAperture.libfuzzer
+      libfuzzer: true
